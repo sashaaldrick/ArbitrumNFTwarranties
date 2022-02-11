@@ -9,12 +9,12 @@ async function run() {
       name: "Warranty Information",
       attributes: [
         {
-          "serial_number": "a11f251da6fbe5878b7d75f053f45049",
+          "serial_number": "1ce18ce708ea4d222c687058e1ec6b11",
           "owner": "Sasha Aldrick"
         }
       ],
-      image: "https://gateway.ipfs.io/ipfs/QmP6knuG7P1SbPMuN2Jucax1mJ6suVAYfzrLAQmoqRVUMH",
-      description: "Warranty Serial No: 1c4984ffa09f9aa5a6dde352ae093412"
+      image: "https://gateway.pinata.cloud/ipfs/QmZoBsCNmeSt1mfNc2ne88MBD1ua22c4rkik6QQ6oMZ213",
+      description: "Warranty Serial No: 1ce18ce708ea4d222c687058e1ec6b11"
     })
   }];
 

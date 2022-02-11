@@ -21,6 +21,23 @@
   background: orange;
 }
 
+.burn-nft-button {
+  background: red;
+}
+
+.view-nft-button {
+  background: purple;
+}
+
+
+.transfer-nft-button {
+  background: green;
+}
+
+.token-id-button {
+  background: blue;
+}
+
 .input-address-box {
   padding: 15px;
   margin: 10px;
