@@ -1,21 +1,23 @@
 import './App.css';
-import { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
+import { useEffect, useState } from 'react';
 
 import Warranties from './artifacts/contracts/Warranties.sol/Warranties.json';
-const contractAddress = "0xBC3a9c5DCF703C0F02013f8AEd59B5D75a57348A";
 const abi = Warranties.abi;
+const contractAddress = "0xBC3a9c5DCF703C0F02013f8AEd59B5D75a57348A";
 const owner = "0x2d57e5e2bb5ea3bcd001668e3def98b6ee040e5e";
 
 function App() {
+  // setting state variables and respective setters.
   const [currentAccount, setCurrentAccount] = useState(null);
   const [senderAddress, setSenderAddress] = useState('');
   const [transferAddress, setTransferAddress] = useState('');
 
-  let [arrayOfIDs, setArrayOfIDs] = useState([]);
   let [arrayFlag, setArrayFlag] = useState(false);
+  let [arrayOfIDs, setArrayOfIDs] = useState([]);
  
   const checkWalletIsConnected = async () => { 
+    // checking metamask and if found auto connect to connected active account.
     const { ethereum } = window;
 
     if (!ethereum) {
@@ -38,6 +40,8 @@ function App() {
   }
 
   const connectWalletHandler = async () => { 
+    // if no auto-login, show a connect wallet button to allow for connection to metamask.
+
     const { ethereum } = window;
 
     if (!ethereum) {
@@ -54,13 +58,12 @@ function App() {
   }
 
   const retrieveTokenIDs = async () => {
-    let tempArray = [];
 
-    setArrayFlag(false);
+    let tempArray = [];
+    setArrayFlag(false); // stop displaying array of tokenIDs on the page.
 
     try {
       const { ethereum } = window;
-
       if(ethereum) {
 
         // get connection to the blockchain with a provider.
@@ -75,19 +78,24 @@ function App() {
 
         // retrieve NFT owner address.
         const tokenIDs = await contract.getTokenIDs(currentAccount);
-        console.log("Token IDs returned: ", tokenIDs);
+
 
         if (tokenIDs.length > 0) {
           function convertAndAdd(value, index, array) {
+            // if length not 0, push the tokenIDs from the tx data to the temporary array.  
             tempArray.push(Number(tokenIDs[index]["_hex"]));
           }
 
+          // run convertAndAdd on each member of the tokenIDs array.
           tokenIDs.forEach(convertAndAdd);
+
+          //update React state 'ArrayOfIDs' with contents of temporary array i.e. all tokenIDs associated with an account.
           setArrayOfIDs(tempArray);
-          setArrayFlag(true);
+          setArrayFlag(true); // allow display of ArrayOfIDs on page now.
+
         } else {
           alert("No NFTs found!");
-          return;
+          setArrayOfIDs([]);
         }
 
       } else {
@@ -99,8 +107,8 @@ function App() {
   };
 
   const mintNFTHandler = async () => {
-    console.log("Sender Address received: ", senderAddress);
 
+    // ipfs json URLs for NFT info + image.
     const tokenURIs = [
       "https://gateway.ipfs.io/ipfs/QmRqBdJwTGsvXxQMvBQsaxTr2MxRz9rxXREV4f3qgc74ve", //RinkArby 1
       "https://gateway.ipfs.io/ipfs/QmfSvxRS5BTLtgeYvPqiXx2huaRBuXd2nNN8gq5FTwmXp1", // RinkArby 2
@@ -109,8 +117,10 @@ function App() {
       "https://gateway.ipfs.io/ipfs/QmRqBdJwTGsvXxQMvBQsaxTr2MxRz9rxXREV4f3qgc74ve", // RinkArby 5
     ];
 
-    const tokenURI = tokenURIs[Math.floor(Math.random() * tokenURIs.length)];
+    // choose a random warranty to mint
+    const tokenURI = tokenURIs[Math.floor(Math.random() * tokenURIs.length)]; 
 
+    // check if current account connected in metamask is contract owner.
     if (currentAccount !== owner) {
       alert("You have to be the owner of this contract to mint NFTs!");
       return;
@@ -130,30 +140,22 @@ function App() {
         // and subsequently the provider as well.
         const contract = new ethers.Contract(contractAddress, abi, signer);
   
-        // send transaction.
+        // send mint transaction.
         let transaction = await contract.awardItem(senderAddress, tokenURI);
   
         // make sure to wait for transaction to go through.
-        // await provider.waitForTransaction(transaction);
         await transaction.wait();
         console.log(`Transaction hash: ${transaction.hash}`);
         
-        // const receipt = await provider.getTransactionReceipt(transaction.hash);
-        // const logs = receipt.logs;
-        // const tokenID = ethers.BigNumber.from(logs[0]["topics"][3]).toNumber();
-        // console.log(tokenID);
-
       } else {
         console.log("Ethereum object does not exist. Are you sure Metamask is installed/functioning properly?");
       }
     } catch (err) {
       console.log(err);
     }
-   };
+  };
 
   const transferNFTHandler = async () => {
-    console.log("Transfer Address received: ", transferAddress);
-    
     try {
       const { ethereum } = window;
 
@@ -174,13 +176,26 @@ function App() {
 
         const tokenIDToTransfer = prompt("Enter the token ID of the NFT you want to transfer");
 
+        // convert string prompt input to integer.
         const tokenInt = parseInt(tokenIDToTransfer);
         console.log("tokenInt: " + tokenInt);
+
         try {
+          // send transfer transaction.
           let transaction = await contract.transferWarranty(transferAddress, tokenInt);
           await transaction.wait();
           console.log(`Transaction hash: ${transaction.hash}`);
-          setArrayOfIDs([]);
+
+          await retrieveTokenIDs();
+
+          for (let i=0, i < ArrayOfIDs.)
+
+
+
+
+
+
+          setArrayOfIDs([]); //
           setArrayFlag(false);
         } catch (err) {
           alert("Are you sure you own this NFT!")
@@ -377,6 +392,7 @@ function App() {
 
   useEffect(() => {
     checkWalletIsConnected();
+    retrieveTokenIDs();
   }, []);
 
   return (
