@@ -1,5 +1,6 @@
-# Warranfties
+# Warranfties 
 ------------------------------------------------------
+### In case that word made your head hurt, we're talking about NFT warranties... 😅
 
 * Digital product warranties already exist, but are easy to fake.
 * How can we fix this?
