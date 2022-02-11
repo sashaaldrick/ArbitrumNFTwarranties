@@ -1,8 +1,9 @@
 const { arbLog, requireEnvVariables } = require('./arb-shared-dependencies');
+requireEnvVariables(['DEVNET_PRIVKEY', 'RINKARBY_API_KEY', 'INFURA_API_KEY']);
+
+require('dotenv').config();
 const { ethers } = require("ethers");
 const hre = require("hardhat");
-require('dotenv').config();
-requireEnvVariables(['DEVNET_PRIVKEY', 'RINKARBY_API_KEY', 'INFURA_API_KEY']);
 
 const addresses = [
     "0x2008aC70B2920c9A345Ea7fff1DEd1FD4302Bdf0", //RinkArby 1
@@ -23,11 +24,9 @@ const tokenURIs = [
   const contractAddress = "0xBC3a9c5DCF703C0F02013f8AEd59B5D75a57348A";
   
   async function main() {
-    await arbLog('NFT Minting on Arbitrum Rinkeby - Rinkarby');
+    await arbLog('NFT Minting on Rinkarby');
 
     const contract = await hre.ethers.getContractAt("Warranties", contractAddress);
-
-    // console.log(contract);
 
     const privKey = process.env.DEVNET_PRIVKEY;
     const apiKey = process.env.INFURA_API_KEY;
@@ -38,14 +37,14 @@ const tokenURIs = [
 
     console.log('Your wallet address:', l2Wallet.address);
 
-    // const nonce = await l2Wallet.getTransactionCount();
+    const nonce = await l2Wallet.getTransactionCount();
     
-    // for(let i = 0; i < addresses.length; i++) {
-    //   await contract.awardItem(addresses[i], tokenURIs[i],  {
-    //     nonce: nonce + i
-    //   });
-    // }
-    // console.log("Minting is complete!");
+    for(let i = 0; i < addresses.length; i++) {
+      await contract.connect(l2Wallet).awardItem(addresses[i], tokenURIs[i],  {
+        nonce: nonce + i
+      });
+    }
+    console.log("Minting is complete!");
   }
   
   main()

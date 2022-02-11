@@ -18,10 +18,6 @@ async function main() {
 
   const contract = new ethers.Contract(contractAddress, Warranties.abi, provider);
 
-  // console.log('Contract details: ' + contract);
-  // console.log(owner.address);
-  // console.log(NFTOwner.address);
-
   const tokenURI = "https://gateway.ipfs.io/ipfs/QmcV5v8LPU6USQ14rB9E6yiqcoTM5YSFz9joH52XwSVaTy";
 
   const contractWithSigner = contract.connect(owner);

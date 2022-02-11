@@ -1,3 +1,6 @@
+// this is a file I pulled from: https://github.com/OffchainLabs/arbitrum-tutorials/tree/master/packages/demo-dapp-pet-shop
+// some Arbitrum helper functions.
+
 const hardhatConfig = require('../hardhat.config.js')
 require('dotenv').config()
 

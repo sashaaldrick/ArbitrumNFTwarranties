@@ -11,7 +11,6 @@ async function main() {
     const owner = accounts[0];
 
     console.log(owner);
-
 }
 
 main();
