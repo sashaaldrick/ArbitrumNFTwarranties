@@ -22,8 +22,8 @@ npx hardhat run scripts/deploy_arbitrum.js --network rinkarby
 ```
 Otherwise, to deploy to Rinkarby, make sure you place the required environment variables in .env:
 
-DEVNET_PRIVKEY="your account on Rinkarby whom you want to deploy the contract from"
-INFURA_API_KEY="infura Project ID" (to use Alchemy, change the provider to an [AlchemyProvider](https://docs.ethers.io/v5/api/providers/api-providers/#AlchemyProvider))
+* DEVNET_PRIVKEY="your account on Rinkarby whom you want to deploy the contract from"
+* INFURA_API_KEY="infura Project ID" (to use Alchemy, change the provider to an [AlchemyProvider](https://docs.ethers.io/v5/api/providers/api-providers/#AlchemyProvider))
 
 Be sure to fund your Rinkeby account first with ETH from somewhere like [here](https://faucets.chain.link/rinkeby).
 
