@@ -15,7 +15,7 @@ function App() {
 
   let [arrayFlag, setArrayFlag] = useState(false);
   let [arrayOfIDs, setArrayOfIDs] = useState([]);
- 
+
   const checkWalletIsConnected = async () => { 
     // checking metamask and if found auto connect to connected active account.
     const { ethereum } = window;
@@ -57,8 +57,9 @@ function App() {
     }
   }
 
-  const retrieveTokenIDs = async () => {
+  const retrieveNFTHandler = async () => {
 
+    // retrieve the token IDs associated with the current account.
     let tempArray = [];
     setArrayFlag(false); // stop displaying array of tokenIDs on the page.
 
@@ -78,7 +79,6 @@ function App() {
 
         // retrieve NFT owner address.
         const tokenIDs = await contract.getTokenIDs(currentAccount);
-
 
         if (tokenIDs.length > 0) {
           function convertAndAdd(value, index, array) {
@@ -104,10 +104,13 @@ function App() {
     } catch (err) {
       console.log(err);
     }
+
+    // display flag for UI text 'No NFT's found' only to show up after user has pressed the retrieve button.
   };
 
+  // onClick button functions.
   const mintNFTHandler = async () => {
-
+    // handles the minting of NFTs.
     // ipfs json URLs for NFT info + image.
     const tokenURIs = [
       "https://gateway.ipfs.io/ipfs/QmRqBdJwTGsvXxQMvBQsaxTr2MxRz9rxXREV4f3qgc74ve", //RinkArby 1
@@ -156,6 +159,8 @@ function App() {
   };
 
   const transferNFTHandler = async () => {
+    // handles the transfer of the specific token.
+
     try {
       const { ethereum } = window;
 
@@ -186,17 +191,22 @@ function App() {
           await transaction.wait();
           console.log(`Transaction hash: ${transaction.hash}`);
 
-          await retrieveTokenIDs();
+          await retrieveNFTHandler();
 
-          for (let i=0, i < ArrayOfIDs.)
+          // removing token ID from list of tokenIDs associated to current account.
 
+          let tempArray = [];
+          for (let i = 0; i < arrayOfIDs.length; i++) {
+            if(arrayOfIDs !== "") {
+              tempArray.push(arrayOfIDs[i]);
+            }
+          };
 
-
-
-
-
-          setArrayOfIDs([]); //
+          // set ArrayOfIDs to new token ID list without the one transferred and refresh display on page.
           setArrayFlag(false);
+          setArrayOfIDs(tempArray); //
+          setArrayFlag(true);
+
         } catch (err) {
           alert("Are you sure you own this NFT!")
           return;
@@ -210,53 +220,53 @@ function App() {
   };
 
   const burnNFTHandler = async () => {
+    // handles burning of the NFT after pressing burn.
+    // only the owner of the contract can burn NFTs.
     if (currentAccount !== owner) {
       alert("You are not the contract owner, you do not have rights to burn NFTs");
       return;
     }
-    alert("Are you sure you want to burn?");
+    // Confirmation message
+    let promptText = "Are you sure you want to burn?";
+    if (window.confirm(promptText) == true) {
+      try {
+        const { ethereum } = window;
+  
+        if(ethereum) {
+          // get connection to the blockchain with a provider.
+          const provider = new ethers.providers.Web3Provider(ethereum);
     
-    try {
-      const { ethereum } = window;
-
-      if(ethereum) {
-        // get connection to the blockchain with a provider.
-        const provider = new ethers.providers.Web3Provider(ethereum);
+          // get the connected account as a signer for transaction signing.
+          const signer = provider.getSigner();
+    
+          // instantiates a on chain contract as a JavaScript object connected to the signer
+          // and subsequently the provider as well.
+          const contract = new ethers.Contract(contractAddress, abi, signer);
   
-        // get the connected account as a signer for transaction signing.
-        const signer = provider.getSigner();
+          // retrieve list of NFTs for current connected account.
+          const tokenIDToBurn = prompt("Which token ID to burn?");
+          const tokenInt = parseInt(tokenIDToBurn);
   
-        // instantiates a on chain contract as a JavaScript object connected to the signer
-        // and subsequently the provider as well.
-        const contract = new ethers.Contract(contractAddress, abi, signer);
-
-        // retrieve list of NFTs for current connected account.
-
-        const tokenIDToBurn = prompt("Which token ID to burn?");
-        const tokenInt = parseInt(tokenIDToBurn);
-
-        try {
-          let transaction = await contract.burnWarranty(tokenInt);
-          await transaction.wait();
-          console.log(`Transaction hash: ${transaction.hash}`);
-          console.log("Array of IDs: " + arrayOfIDs);
-          var filteredArray = arrayOfIDs.filter(e => e !== tokenInt);
-          console.log(filteredArray);
-        } catch (err) {
-          alert("Burn not carried out!")
-          console.log(err);
-          return;
+          try {
+            // send burn transaction.
+            let transaction = await contract.burnWarranty(tokenInt);
+            await transaction.wait();
+          } catch (err) {
+            alert("Burn not carried out! Are you sure the token ID is corrent?");
+            console.log(err);
+            return;
+          }
+        } else {
+          console.log("Ethereum object does not exist. Are you sure Metamask is installed/functioning properly?");
         }
-      } else {
-        console.log("Ethereum object does not exist. Are you sure Metamask is installed/functioning properly?");
+      } catch (err) {
+        console.log(err);
       }
-    } catch (err) {
-      console.log(err);
     }
   };
 
   const viewNFTHandler = async () => {
-    
+    // handles finding the image URL from the IPFS tokenURI JSON.
     try {
       const { ethereum } = window;
 
@@ -272,11 +282,10 @@ function App() {
         const contract = new ethers.Contract(contractAddress, abi, signer);
 
         // retrieve list of NFTs for current connected account.
-
         const tokenIDToView = prompt("Which token ID to view?");
         const tokenInt = parseInt(tokenIDToView);
 
-
+        // a function to download the JSON stored at the IPFS token URI and convert it into a JS object.
         async function getObject(tokenURI){
           return fetch(tokenURI)
           .then(response => response.json())
@@ -288,11 +297,12 @@ function App() {
             });
         }
       
-
         try {
           const tokenURI = await contract.tokenURI(tokenInt);
           console.log("tokenURI received: " + tokenURI);
+          // download token URI data.
           const res = await getObject(tokenURI);
+          // retrieve NFT image URL and open in new tab.
           const imageURL = res.image;
           window.open(imageURL, '_blank');
         } catch (err) {
@@ -309,7 +319,8 @@ function App() {
     }
   };
   
-  const connectWallet = () => { 
+  // JSX button functions.
+  const connectWalletButton = () => { 
     return (
       <button onClick={connectWalletHandler} className= "cta-button connect-wallet-button">
         Connect Wallet
@@ -317,9 +328,10 @@ function App() {
     )
   };
 
-  const mintNFT = () => { 
+  const mintNFTButton = () => { 
     return(
       <div>
+        <h3> Contract Owner Special Functions: </h3>
         <input
         className="input-address-box"
         type='text' 
@@ -334,7 +346,45 @@ function App() {
     )
   };
 
-  const transferNFT = () => {
+  const burnNFTButton = () => {
+    return(
+      <div>
+        <br></br>
+        <button onClick={burnNFTHandler} className="cta-button burn-nft-button">
+        Burn NFT 🔥
+        </button>
+      </div>
+    )
+  };
+
+  const retrieveNFTButton = () => {
+    return(
+      <div>
+        {/* <input
+        className="input-address-box"
+        type='text' 
+        onChange={e => setretrieveAddress(e.target.value)} 
+        placeholder="Address to check..." /> */}
+        <button onClick={retrieveNFTHandler} className="cta-button token-id-button">
+        Retrieve your NFTs 📨
+        </button>
+        <br></br>
+      </div>
+    )
+  };
+
+  const viewNFTButton = () => {
+    return(
+      <div>
+        <br></br>
+        <button onClick={viewNFTHandler} className="cta-button view-nft-button">
+        View NFT 👀
+        </button>
+      </div>
+    )
+  }
+
+  const transferNFTButton = () => {
     return(
       <div>
         <br></br>
@@ -348,70 +398,43 @@ function App() {
         <button onClick={transferNFTHandler} className="cta-button transfer-nft-button">
           Transfer NFT 📭
         </button>
+        <br></br>
+        <br></br>
+        <br></br>
+        <br></br>
       </div>
     )
   };
-
-  const retrieveNFT = () => {
-    return(
-      <div>
-        <br></br>
-        {/* <input
-        className="input-address-box"
-        type='text' 
-        onChange={e => setretrieveAddress(e.target.value)} 
-        placeholder="Address to check..." /> */}
-        <button onClick={retrieveTokenIDs} className="cta-button token-id-button">
-        Retrieve your NFTs 📨
-        </button>
-      </div>
-    )
-  };
-
-  const burnNFT = () => {
-    return(
-      <div>
-        <br></br>
-        <button onClick={burnNFTHandler} className="cta-button burn-nft-button">
-        Burn NFT 🔥
-        </button>
-      </div>
-    )
-  };
-
-  const viewNFT = () => {
-    return(
-      <div>
-        <br></br>
-        <button onClick={viewNFTHandler} className="cta-button view-nft-button">
-        View NFT 👀
-        </button>
-      </div>
-    )
-  }
 
   useEffect(() => {
+    // run before App is loaded (something like that).
     checkWalletIsConnected();
-    retrieveTokenIDs();
   }, []);
 
+  // page JSX.
   return (
     <div className='main-app'>
       <h1> NFT Warranties Prototype </h1>
         {
           currentAccount === owner ? 
-          <h3> You are the contract owner! ✅ Welcome 🤩 </h3> 
+          <h2> You are the contract owner! ✅ Welcome 🤩 </h2> 
           : ''
         }
       <div> 
-        { currentAccount == owner ? mintNFT() : ''} 
-        { currentAccount == owner ? burnNFT() : ''} 
+        { currentAccount == owner ? mintNFTButton() : ''} 
+        { currentAccount == owner ? burnNFTButton() : ''} 
 
-        { currentAccount ? retrieveNFT() : connectWallet() }
-        { arrayFlag ? <h3>Your NFT Serial Numbers: {arrayOfIDs.join(", ")}</h3> : ''}
+        <br></br>
+        <br></br>
 
-        { currentAccount ? viewNFT() : '' }
-        { currentAccount ? transferNFT() : '' }
+        { arrayFlag && arrayOfIDs.length > 0 ? 
+            <h3>Your NFT token ID(s): {arrayOfIDs.join(", ")}</h3> : 
+            <div><h3> No NFTs found. </h3></div>
+        }
+    
+        { currentAccount ? retrieveNFTButton() : connectWalletButton() }
+        { currentAccount ? viewNFTButton() : '' }
+        { currentAccount ? transferNFTButton() : '' }
         
       </div>
       <div>

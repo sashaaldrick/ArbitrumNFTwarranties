@@ -55,10 +55,11 @@ npx hardhat test
 
 ----------------------------------------------
 
-### Some known bugs:
+### Some known bugs and TODOs:
 
 * The removal of NFT IDs associated to an address, stored on-chain in mapping 'NFTOwner' behaves incorrectly on NFT burn. It removes all token IDs associated with that address from the mapping 'NFTOwner'. To fix this, it might require an off-chain solution, as Solidity has limited array methods. Perhaps using OpenZeppellin's ERC721URIStorage method _getApprovedAddress_ would work somehow as a solution.
-	* Furthermore, this would fix the issue that if you click "View NFTs" after "Burn NFTs", it can lead to the alert "No NFTs found", even if you have some!
-* The code is quite hideous to read at the moment, a big refactoring is needed. This will be a good warmup for ETHDenver for me.
-
+	*  Furthermore, this would fix the issue that if you click "View NFTs" after "Burn NFTs", it can lead to the alert "No NFTs found", even if you have some!
+* [FIXED]  ~~The code is quite hideous to read at the moment, a big refactoring is needed. This will be a good warmup for ETHDenver for me. ~~
+* I could package up a lot of code into functions and save a load of lines, but that is just no super necessary so I will save the time. Otherwise, definitely worth doing if deploying to the live web just for speeds sake.
+* It really annoys me that upon loading you see "No NFTs found". This should only appear after it has been verified that the 'Retrieve NFT button' has been pressed.
 
